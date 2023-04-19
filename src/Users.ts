@@ -1,5 +1,5 @@
 import { v4 } from "uuid"
-import { createUser, getUserEvents, updateUser } from "./Controllers/Users"
+import { createUser, getUser, getUserEvents, updateUser } from "./Controllers/Users"
 import { UserEventType } from "./Types/Users"
 import { foldUserEvents } from "./Helpers/Users"
 
@@ -35,8 +35,7 @@ export const handler = async (event: ApiGatewayEvent): Promise<unknown> => {
         const userEvents = await getUserEvents(event.pathParameters.userId)
         return successResponse(userEvents)
     } else if (event.httpMethod === 'GET' && event.pathParameters !== null && 'userId' in event.pathParameters) {
-        const userEvents = await getUserEvents(event.pathParameters.userId)
-        return successResponse(foldUserEvents(userEvents))
+        return successResponse(await getUser(event.pathParameters.userId))
     } else if (event.httpMethod === 'PUT' && event.pathParameters !== null && 'userId' in event.pathParameters && event.body !== null) {
         return successResponse(await updateUser({
             eventType: UserEventType.UpsertName,
