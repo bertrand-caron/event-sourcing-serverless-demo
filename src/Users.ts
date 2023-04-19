@@ -11,6 +11,7 @@ const DEFAULT_HEADERS = {
 
 type ApiGatewayEvent = {
     readonly httpMethod: string
+    readonly path: string
     readonly pathParameters: {[key: string]: string} | null
     readonly body: string | null
 }
@@ -30,6 +31,9 @@ export const handler = async (event: ApiGatewayEvent): Promise<unknown> => {
             userId: v4(),
             createdAt: new Date().toISOString(),
         }))
+    } else if (event.httpMethod === 'GET' && event.pathParameters !== null && 'userId' in event.pathParameters && event.path.endsWith('/events')) {
+        const userEvents = await getUserEvents(event.pathParameters.userId)
+        return successResponse(userEvents)
     } else if (event.httpMethod === 'GET' && event.pathParameters !== null && 'userId' in event.pathParameters) {
         const userEvents = await getUserEvents(event.pathParameters.userId)
         return successResponse(foldUserEvents(userEvents))

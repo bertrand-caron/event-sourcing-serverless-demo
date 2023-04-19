@@ -55,6 +55,14 @@ functions:
                   userId: true
             cors: true
         - http:
+            method: get
+            path: users/{userId}/events
+            request:
+              parameters:
+                paths:
+                  userId: true
+            cors: true
+        - http:
             method: put
             path: users/{userId}
             request:
