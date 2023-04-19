@@ -1,0 +1,8 @@
+{
+  "name": "event-sourcing-demo",
+  "version": "1.0.0",
+  "description": "Serverless event sourcing demo for the Talk is cheap: Show me the Code (Episode III) event in Brisbane, Australia.",
+  "repository": "git@github.com:bertrand-caron/event-sourcing-demo.git",
+  "author": "Bertrand Caron <bertrand.fx.caron@gmail.com>",
+  "license": "MIT"
+}
