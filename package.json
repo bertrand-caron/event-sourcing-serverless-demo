@@ -10,6 +10,7 @@
     "deploy": "sls deploy --stage dev"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.194",
     "@types/uuid": "^9.0.1",
     "serverless-plugin-typescript": "^2.1.4",
     "typescript": "^5.0.4"
@@ -17,6 +18,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.315.0",
     "@aws-sdk/lib-dynamodb": "^3.315.0",
+    "lodash": "^4.17.21",
     "uuid": "^9.0.0"
   }
 }
