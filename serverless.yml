@@ -12,6 +12,12 @@ provider:
   region: ap-southeast-2
   apiGateway:
     shouldStartNameWithService: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 'dynamodb:*'
+          Resource: '*'
 
 # Create custom resources with separate CloudFormation templates
 resources:
@@ -19,14 +25,14 @@ resources:
     UsersEventsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: user-events-${opt:stage}
+        TableName: user-events
         AttributeDefinitions:
-          - AttributeName: uuid
+          - AttributeName: userId
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: S
         KeySchema:
-          - AttributeName: uuid
+          - AttributeName: userId
             KeyType: HASH
           - AttributeName: createdAt
             KeyType: RANGE

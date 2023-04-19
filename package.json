@@ -6,10 +6,17 @@
   "author": "Bertrand Caron <bertrand.fx.caron@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "build": "tsc --noEmit",
     "deploy": "sls deploy --stage dev"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.1",
     "serverless-plugin-typescript": "^2.1.4",
     "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.315.0",
+    "@aws-sdk/lib-dynamodb": "^3.315.0",
+    "uuid": "^9.0.0"
   }
 }
