@@ -14,7 +14,23 @@ provider:
     shouldStartNameWithService: true
 
 # Create custom resources with separate CloudFormation templates
-resources: []
+resources:
+  Resources:
+    UsersEventsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: user-events-${opt:stage}
+        AttributeDefinitions:
+          - AttributeName: uuid
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: uuid
+            KeyType: HASH
+          - AttributeName: createdAt
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
 
 functions:
   - Users:
