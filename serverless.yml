@@ -43,7 +43,7 @@ functions:
       handler: src/Users.handler
       events:
         - http:
-            method: get
+            method: post
             path: users
             cors: true
         - http:
@@ -55,11 +55,11 @@ functions:
                   userId: true
             cors: true
         - http:
-            method: post
-            path: users
-            cors: true
-        - http:
             method: put
-            path: users
+            path: users/{userId}
+            request:
+              parameters:
+                paths:
+                  userId: true
             cors: true
 

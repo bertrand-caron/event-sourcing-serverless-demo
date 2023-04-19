@@ -1,5 +1,5 @@
 import { v4 } from "uuid"
-import { createUser, getUserEvents } from "./Controllers/Users"
+import { createUser, getUserEvents, updateUser } from "./Controllers/Users"
 import { UserEventType } from "./Types/Users"
 import { foldUserEvents } from "./Helpers/Users"
 
@@ -12,6 +12,7 @@ const DEFAULT_HEADERS = {
 type ApiGatewayEvent = {
     readonly httpMethod: string
     readonly pathParameters: {[key: string]: string} | null
+    readonly body: string | null
 }
 
 const successResponse = (response: unknown) => ({
@@ -31,9 +32,13 @@ export const handler = async (event: ApiGatewayEvent): Promise<unknown> => {
         }))
     } else if (event.httpMethod === 'GET' && event.pathParameters !== null && 'userId' in event.pathParameters) {
         const userEvents = await getUserEvents(event.pathParameters.userId)
-
         return successResponse(foldUserEvents(userEvents))
-    } else {
-        return successResponse(true)
+    } else if (event.httpMethod === 'PUT' && event.pathParameters !== null && 'userId' in event.pathParameters && event.body !== null) {
+        return successResponse(await updateUser({
+            eventType: UserEventType.UpsertName,
+            name: JSON.parse(event.body).name,
+            userId: event.pathParameters.userId,
+            createdAt: new Date().toISOString(),
+        }))
     }
 }
