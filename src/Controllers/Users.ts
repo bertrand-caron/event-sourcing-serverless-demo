@@ -1,7 +1,7 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
-import { DynamoDBDocumentClient, GetCommand, QueryCommand, TransactWriteCommand } from "@aws-sdk/lib-dynamodb"
-import type { CreateUserEvent, UpsertNameUserEvent, User, UserEvent } from "../Types/Users"
-import { omit, pick } from "lodash"
+import { DynamoDBClient, ScanCommandInput } from "@aws-sdk/client-dynamodb"
+import { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand, TransactWriteCommand } from "@aws-sdk/lib-dynamodb"
+import { CreateUserEvent, UpsertNameUserEvent, User, UserEvent, UserEventType } from "../Types/Users"
+import { omit, pick, reduce } from "lodash"
 
 export const DYNAMODB_DOCUMENT_CLIENT = DynamoDBDocumentClient.from(new DynamoDBClient({region: 'ap-southeast-2'}), {
     marshallOptions: {removeUndefinedValues: true},
@@ -48,6 +48,27 @@ export const getUserEvents = async (userId: string): Promise<UserEvent[]> => {
     return response.Items as unknown as UserEvent[]
 }
 
+export const getAllUserEvents = async (): Promise<UserEvent[]> => {
+    const params: ScanCommandInput = {
+        TableName: 'user-events',
+        ExclusiveStartKey: undefined as {[key: string]: any} | undefined,
+    }
+    let response = await DYNAMODB_DOCUMENT_CLIENT.send(new ScanCommand(params))
+    const records = response.Items as UserEvent[]
+
+    // Continue while there are more records to fetch
+    while (response.LastEvaluatedKey) {
+        // Get the continuation key
+        params.ExclusiveStartKey = response.LastEvaluatedKey as {[key: string]: any}
+        // Get the new records
+        response = await DYNAMODB_DOCUMENT_CLIENT.send(new ScanCommand(params)) // eslint-disable-line no-await-in-loop
+        // Fold them
+        records.push(...((response.Items ?? []) as UserEvent[]))
+    }
+
+    return records
+}
+
 export const updateUser = async (event: UpsertNameUserEvent): Promise<UpsertNameUserEvent> => {
     await DYNAMODB_DOCUMENT_CLIENT.send(
         new TransactWriteCommand({
@@ -89,4 +110,12 @@ export const getUser = async (userId: string): Promise<User> => {
     )
 
     return response.Item as User
+}
+
+export const getUserStats = async (): Promise<Record<UserEventType, number>> => {
+    return reduce(
+        await getAllUserEvents(),
+        (acc, e) => ({...acc, [e.eventType]: acc[e.eventType] + 1}),
+        Object.fromEntries(Object.values(UserEventType).map(k => [k, 0])) as Record<UserEventType, number>,
+    )
 }

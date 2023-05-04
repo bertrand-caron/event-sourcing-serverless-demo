@@ -81,4 +81,8 @@ functions:
                 paths:
                   userId: true
             cors: true
+        - http:
+            method: put
+            path: users/stats
+            cors: true
 

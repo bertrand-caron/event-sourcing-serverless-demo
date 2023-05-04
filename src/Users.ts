@@ -1,7 +1,6 @@
 import { v4 } from "uuid"
-import { createUser, getUser, getUserEvents, updateUser } from "./Controllers/Users"
+import { createUser, getUser, getUserEvents, getUserStats, updateUser } from "./Controllers/Users"
 import { UserEventType } from "./Types/Users"
-import { foldUserEvents } from "./Helpers/Users"
 
 const DEFAULT_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -31,6 +30,10 @@ export const handler = async (event: ApiGatewayEvent): Promise<unknown> => {
             userId: v4(),
             createdAt: new Date().toISOString(),
         }))
+    } else if (event.httpMethod === 'GET' && event.path === '/users/stats') {
+        return successResponse(
+            await getUserStats()
+        )
     } else if (event.httpMethod === 'GET' && event.pathParameters !== null && 'userId' in event.pathParameters && event.path.endsWith('/events')) {
         const userEvents = await getUserEvents(event.pathParameters.userId)
         return successResponse(userEvents)
